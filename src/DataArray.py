@@ -11,7 +11,7 @@ class DataArray:
                 values = line.split(" ")
                 rows.append(values[0])
                 array.append(values[1:])
-            return DataArray(array, rows, lines[0].split(" ")[1:])
+            return DataArray(array, rows, lines[0].split(" "))
 
     def __init__(self, values, rows, columns):
         self.values, self.rows, self.columns = values, rows, columns
