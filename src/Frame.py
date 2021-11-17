@@ -1,9 +1,10 @@
-from tkinter import *
+from tkinter import Frame, Label, Button, YES
 from time import sleep
 from src.DataInput import DataInput
+from src.utils import present_xhi2_data
 
 
-class ClassFrame(Frame):
+class Frame(Frame):
 
     def __init__(self, containeur, color):
         super().__init__(containeur, bg=color)
@@ -50,6 +51,9 @@ class ClassFrame(Frame):
 
     def add_Entry(self, entry):
         self.add_element(entry, expand=YES)
+
+    def on_load(self, callback):
+        self.bind("<Map>", callback)
     """
     def add_Bind(self, cmmd):
         self.Bind = bind(self, command=cmd)
@@ -60,21 +64,27 @@ class ClassFrame(Frame):
 """
     @classmethod
     def build_home(cls, window, callback):
-        frame = ClassFrame(window, "#4682B4")
+        frame = Frame(window, "#4682B4")
         frame.add_text("Bienvenue sur le test du \u03C7\u00B2", "Arial", 35, '#4682B4', '#FFFFFF')
-        frame.add_Button("Continuer", "Arrial", 20, '#FFFFFF', '#4682B4', callback)
+        frame.add_Button("Continuer", "Arial", 20, '#FFFFFF', '#4682B4', callback)
         frame.pack(expand=YES)
         return frame
 
     @classmethod
     def build_data_selection(cls, window, callback):
 
-        frame = ClassFrame(window, "#4682B4")
+        frame = Frame(window, "#4682B4")
         frame.add_text(
             "Sélectionnez votre échantillons de mesures",
             "Arial", 18, '#4682B4', '#FFFFFF')
-        #frame.add_Entry(())
-        frame.add_Button("Calculer", "Arrial", 20, '#FFFFFF', '#4682B4', callback)
+        frame.add_Button("Calculer", "Arial", 20, '#FFFFFF', '#4682B4', callback)
         data_input = DataInput(frame)
         frame.add_element(data_input)
         return frame, data_input
+
+    @classmethod
+    def build_table(cls, window, data_provider):
+        frame = Frame(window, "#4682B4")
+        frame.add_text("Tableau de \u03C7\u00B2", "Arial", 20, '#4682B4', '#FFFFFF')
+        frame.on_load(lambda e: present_xhi2_data(data_provider()))
+        return frame
