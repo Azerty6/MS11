@@ -76,9 +76,10 @@ def display_data(experimental_frequencies, data, mean, std_dev, class_count, xhi
     # On met une legende sur l'axe y
     plt.ylabel('Frequence')
     plt.show()
+    print(xhi2)
 
 
-def present_xhi2_data(data):
+def get_xhi2_data(data):
     values = compute_reduced_centered_vars(data)
     min_value = values[0]
     max_value = values[-1]
@@ -98,17 +99,12 @@ def present_xhi2_data(data):
     xhi2 = class_count * sum(
         [(class_.experimental_frequency * class_.theorical_frequency) ** 2 / class_.theorical_frequency for class_ in
          class_data])
-    display_data(
-        experimental_frequencies=(class_.experimental_frequency for class_ in class_data),
-        data=data,
-        mean=statistics.mean(data),
-        std_dev=statistics.stdev(data),
-        class_count=class_count,
-        xhi2=xhi2
-    )
+    return class_data, xhi2
+
 
 
 
 __all__ = [
-    "present_xhi2_data"
+    "get_xhi2_data",
+    "display_data"
 ]

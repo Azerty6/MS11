@@ -30,12 +30,18 @@ class DataInput(Frame):
                 self.generate_entry()
             # For some reason, if we remove that, it doesn't seem to work anymore. Strange...
         entry_value.trace_add("write", add_data_callback)
-        entry = Entry(self, width=50, font=("Arrial", 18), bg='#FFFFFF', fg='#4682B4',
+        entry = Entry(self, width=10, font=("Arrial", 18), bg='#FFFFFF', fg='#4682B4',
                       textvariable=entry_value)
-        entry.pack(expand=YES)
+        entry.grid(column=len(self.entries) % 10, row=len(self.entries) // 10)
         self.entries.append(entry)
 
     def get_data(self):
         print([entry for entry in self.entries])
         [print(entry.get()) for entry in self.entries]
         return [float(entry.get()) for entry in self.entries if entry.get() != ""]
+
+    def clear(self):
+        for entry in self.entries:
+            entry.destroy()
+        self.entries.clear()
+        self.generate_entry()

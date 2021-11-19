@@ -1,7 +1,9 @@
+import os
+import statistics
 from tkinter import Frame, Label, Button, YES
 from time import sleep
 from src.DataInput import DataInput
-from src.utils import present_xhi2_data
+from src.utils import get_xhi2_data, display_data
 
 
 class Frame(Frame):
@@ -72,12 +74,21 @@ class Frame(Frame):
 
     @classmethod
     def build_data_selection(cls, window, callback):
-
+        def import_values():
+            data_input.clear()
+            print(os.listdir())
+            with open("../input/data", "r") as file:
+                content = file.readlines()
+                print(content)
+                for i, line in enumerate(content):
+                    data_input.entries[i].insert(0, line.replace("\n", ""))
+                    data_input.generate_entry()
         frame = Frame(window, "#4682B4")
         frame.add_text(
             "Sélectionnez votre échantillons de mesures",
             "Arial", 18, '#4682B4', '#FFFFFF')
         frame.add_Button("Calculer", "Arial", 20, '#FFFFFF', '#4682B4', callback)
+        frame.add_Button("Importer des valeurs (fichier input/data)", "Arial", 20, '#FFFFFF', '#4682B4', import_values)
         data_input = DataInput(frame)
         frame.add_element(data_input)
         return frame, data_input
@@ -86,5 +97,22 @@ class Frame(Frame):
     def build_table(cls, window, data_provider):
         frame = Frame(window, "#4682B4")
         frame.add_text("Tableau de \u03C7\u00B2", "Arial", 20, '#4682B4', '#FFFFFF')
-        frame.on_load(lambda e: present_xhi2_data(data_provider()))
+        def load(e):
+            data = data_provider()
+            class_data, xhi2 = get_xhi2_data(data)
+            frame.add_text("Classes :", "Arial", 15, "#4682B4", "#FFFFFF")
+            frame.add_text("\n".join([str(class_) for class_ in class_data]), "Arial", 10, "#4682B4", "#FFFFFF")
+            frame.add_text(f"\u03C7\u00B2 : {xhi2}", "Arial", 15, "#4682B4", "#FFFFFF")
+            frame.add_text("Données random :", "Arial", 15, "#4682B4", "#FFFFFF")
+            frame.add_text(f"Moyenne : {statistics.mean(data)}", "Arial", 10, "#4682B4", "#FFFFFF")
+            frame.add_text(f"Ecart type : {statistics.stdev(data)}", "Arial", 10, "#4682B4", "#FFFFFF")
+            display_data(
+                experimental_frequencies=(class_.experimental_frequency for class_ in class_data),
+                data=data,
+                mean=statistics.mean(data),
+                std_dev=statistics.stdev(data),
+                class_count=len(class_data),
+                xhi2=xhi2
+            )
+        frame.on_load(load)
         return frame

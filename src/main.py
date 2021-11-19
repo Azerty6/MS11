@@ -1,11 +1,4 @@
-import math
-import statistics
-import matplotlib.pyplot as plt
-import numpy as np
-from src.DataArray import DataArray
-from src.ClassData import ClassData
 from src.Frame import Frame
-from src.utils import present_xhi2_data
 
 from tkinter import Tk, mainloop, Entry, YES
 
