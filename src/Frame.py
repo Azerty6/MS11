@@ -99,15 +99,18 @@ class Frame(Frame):
         frame.add_text("Tableau de \u03C7\u00B2", "Arial", 20, '#4682B4', '#FFFFFF')
         def load(e):
             data = data_provider()
-            class_data, xhi2 = get_xhi2_data(data)
+            class_data, xhi2, class_width, min_values, max_values, values, array_exp_freq = get_xhi2_data(data)
             frame.add_text("Classes :", "Arial", 15, "#4682B4", "#FFFFFF")
             frame.add_text("\n".join([str(class_) for class_ in class_data]), "Arial", 10, "#4682B4", "#FFFFFF")
             frame.add_text(f"\u03C7\u00B2 : {xhi2}", "Arial", 15, "#4682B4", "#FFFFFF")
             frame.add_text("Données random :", "Arial", 15, "#4682B4", "#FFFFFF")
             frame.add_text(f"Moyenne : {statistics.mean(data)}", "Arial", 10, "#4682B4", "#FFFFFF")
             frame.add_text(f"Ecart type : {statistics.stdev(data)}", "Arial", 10, "#4682B4", "#FFFFFF")
-            display_data(
-                experimental_frequencies=(class_.experimental_frequency for class_ in class_data),
+            display_data(class_width=class_width,
+                         min_values=min_values,
+                         max_values=max_values,
+                         values=values,
+                         array_exp_freq=array_exp_freq,
                 data=data,
                 mean=statistics.mean(data),
                 std_dev=statistics.stdev(data),

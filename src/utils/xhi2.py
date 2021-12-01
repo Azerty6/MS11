@@ -27,19 +27,17 @@ def position_in_integration_table(a):
 def theorical_frequency(a, b, integration_table):
     # int(a < 0) = -1 si a > 0, 1 si a < 0
     # Les calculs sont bizarres, mais ils doivent marcher ^^
-    a = abs(int(100 * a))
-    b = abs(int(100 * b))
-    pos_a = position_in_integration_table(a)
-    pos_b = position_in_integration_table(b)
+    abs_a = abs(int(100 * a))
+    abs_b = abs(int(100 * b))
+    pos_a = position_in_integration_table(abs_a)
+    pos_b = position_in_integration_table(abs_b)
     return \
-        (-1) ** int(a < 0) * float(integration_table[pos_a[1], pos_a[0]]) + \
-        (-1) ** int(b > 0) * float(integration_table[pos_b[1], pos_b[0]])
+        ((-1) ** int(a > 0)) * float(integration_table[pos_a[1], pos_a[0]]) + \
+        ((-1) ** int(b < 0)) * float(integration_table[pos_b[1], pos_b[0]])
 
 
-def display_data(experimental_frequencies, data, mean, std_dev, class_count, xhi2):
+def display_data(class_width, min_values, max_values, values, array_exp_freq, data, mean, std_dev, class_count, xhi2):
     fig, ax = plt.subplots()  # On cree la fenetre pyplot
-    exp_freq_array = np.array(experimental_frequencies)  # On change une liste en une matrice
-
     # 10,10,11,11,11,13,12,9,12,14
     # Echantillon test1
     x = []
@@ -47,13 +45,20 @@ def display_data(experimental_frequencies, data, mean, std_dev, class_count, xhi
     # On cree une liste d'antécendant une une matrice d'immage pour pouvoir
     # creer la courbe théorique
     while len(x) <= 100:
-        x.append((data[0] - mean) + len(x) * (data[-1] - data[0]) / 100)
+        x.append((values[0]) + len(x) * (values[-1] - values[0]) / 100)
     for i in range(len(x)):
         y.append((1 / (np.sqrt(2 * np.pi) * std_dev)) * np.exp(-0.5 * ((x[i]) / std_dev) ** 2))
 
-    num_bins = class_count
+    bins = []
+    for i in range(class_count):
+        bins.append(min_values + i*class_width)
+    bins.append(max_values)
+    mean_bins_values = []
+    for i in range(len(bins)-1):
+        mean_bins_values.append((bins[i]+bins[i+1])/2)
+    weights_freq = np.array(array_exp_freq)
     # On construit l'histogramme reel
-    n, bins, patches = ax.hist(exp_freq_array, num_bins, density=True)
+    ax.hist(mean_bins_values, bins, weights=weights_freq)
     # 14,15,16,17,18,14,15,17,16,17,17,18,17,17,13,15,15,15,14,13,16,17,18,14,15,16,17,18,19,17,14,17,16,15,15,16
     # echantillon test 2
     # 0.385,0.387,0.388,0.383,0.391,0.380,0.382,0.384,0,.386,0.389,0.390,0.385,0.389,0.388,0.382,0.387,0.388,0.392,0.383,0.388,0.385
@@ -76,7 +81,6 @@ def display_data(experimental_frequencies, data, mean, std_dev, class_count, xhi
     # On met une legende sur l'axe y
     plt.ylabel('Frequence')
     plt.show()
-    print(xhi2)
 
 
 def get_xhi2_data(data):
@@ -87,6 +91,7 @@ def get_xhi2_data(data):
     class_count = int(math.sqrt(len(values))) + 1
     class_width = width / class_count
     class_data = []
+    array_exp_freq = []
     integration_table = DataArray.load_array("Integrate_gauss")
     for i in range(class_count):
         class_ = ClassData()
@@ -94,14 +99,26 @@ def get_xhi2_data(data):
         class_.supremum = (max_value + 1) if i == class_count - 1 else (min_value + (1 + i) * class_width)
         class_.population = population(min_value + class_width * i, min_value + (1 + i) * class_width, values)
         class_.experimental_frequency = class_.population / len(values)
+        array_exp_freq.append(class_.experimental_frequency)
         class_.theorical_frequency = theorical_frequency(class_.infimum, class_.supremum, integration_table)
         class_data.append(class_)
     xhi2 = class_count * sum(
         [(class_.experimental_frequency * class_.theorical_frequency) ** 2 / class_.theorical_frequency for class_ in
          class_data])
-    return class_data, xhi2
+    return class_data, xhi2, class_width, min_value, max_value, values, array_exp_freq
 
 
+def present_alpha(xhi2, class_count):
+    alpha_table = DataArray.load_array("Alpha_Interval")
+    l_freedom = class_count-3
+    for i in range(alpha_table[l_freedom]):
+        if alpha_table[l_freedom][i] > xhi2:
+            alpha_min = alpha_table[0][i-1]
+            alpha_max = alpha_table[0][i]
+        else:
+            print("")
+    interval_alpha = [alpha_min, alpha_max]
+    return interval_alpha
 
 
 __all__ = [

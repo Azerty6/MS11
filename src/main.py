@@ -1,5 +1,5 @@
 from src.Frame import Frame
-
+from src.Table import Scrollbar_
 from tkinter import Tk, mainloop, Entry, YES
 
 data = []
@@ -59,7 +59,6 @@ window.title("Test du \u03C7\u00B2")
 window.geometry("720x480")
 window.minsize(580, 300)
 window.config(background='#4682B4')
-
 
 frame_home = Frame.build_home(window, home_buttom_continue)
 frame_dataselection, data_input = Frame.build_data_selection(window, data_buttom_calculate)
